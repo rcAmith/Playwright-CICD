@@ -1,34 +1,38 @@
 import { Locator, Page } from "@playwright/test"
 import { BasePage } from "./BasePage.Page";
  
-export class AccountCreatedPage extends BasePage{
-    
+export class AccountCreatedPage extends BasePage {
     private getAccountCreatedTextLocator!: Locator;
     private getContinueButtonText!: Locator;
 
-    constructor(page: Page)
-    {
-    super(page);// Call the constructor of BasePage
-        
+    constructor(page: Page) {
+        super(page);
     }
 
-    public get getAccountCreatedText(): Locator
-    {
-        this.getAccountCreatedTextLocator= this.page.getByText("Account Created!");
+    public get accountCreatedMessage(): Locator {
+        this.getAccountCreatedTextLocator = this.page.getByText('Account Created!', { exact: true });
         return this.getAccountCreatedTextLocator; 
 
     }
     
-    public get getContinueButton(): Locator
-    {
-        this.getContinueButtonText = this.page.locator("//*[@data-qa='continue-button']");
+    public get continueButton(): Locator {
+        this.getContinueButtonText = this.page.locator("[data-qa='continue-button']");
         return this.getContinueButtonText;
 
     }
-    public async navigate() {
-        await this.page.goto(this.baseURL+'/account_created');
+
+    public get getAccountCreatedText(): Locator {
+        return this.accountCreatedMessage;
+    }
+
+    public get getContinueButton(): Locator {
+        return this.continueButton;
+    }
+
+    public async navigate(): Promise<void> {
+        await this.navigateGeneral('/account_created');
     }
 
 }
 
-export default AccountCreatedPage
+export default AccountCreatedPage;

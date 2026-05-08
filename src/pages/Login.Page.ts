@@ -1,8 +1,7 @@
 import { Locator, Page } from "@playwright/test";
 import { BasePage } from "./BasePage.Page";
 
-export class LoginPage extends BasePage{
-    
+export class LoginPage extends BasePage {
     private getLoginEmailInput!: Locator;
     private getLoginPasswordInput!: Locator;
     private getLoginButton!: Locator;
@@ -10,35 +9,36 @@ export class LoginPage extends BasePage{
     private getSignupEmailInput!: Locator;
     private getSignupButton!: Locator;
 
-    constructor(page: Page)
-    {
-        super(page);  // Call the constructor of BasePage
+    constructor(page: Page) {
+        super(page);
     }
-
-    //Methods
 
     public async navigate(): Promise<void> {
-        if (!this.page) {
-            throw new Error("Page is not available");
-        }
-
-      await this.page.goto(this.baseURL+'/login');
+        await this.navigateGeneral('/login');
     }
 
-    public async login(email: string, password: string): Promise<void> {  
+    public get newUserSignupHeading(): Locator {
+        return this.page.getByText('New User Signup!', { exact: true });
+    }
+
+    public get invalidLoginError(): Locator {
+        return this.page.getByText('Your email or password is incorrect!', { exact: true });
+    }
+
+    public async login(email: string, password: string): Promise<void> {
         this.getLoginEmailInput = this.page.locator("[data-qa='login-email']");
-        this.getLoginPasswordInput =this.page.locator("[data-qa='login-password']");
-        this.getLoginButton =this.page.locator("[data-qa='login-button']");
+        this.getLoginPasswordInput = this.page.locator("[data-qa='login-password']");
+        this.getLoginButton = this.page.locator("[data-qa='login-button']");
 
         await this.getLoginEmailInput.fill(email);
         await this.getLoginPasswordInput.fill(password);
         await this.getLoginButton.click();
     }
 
-    public async signup(name:string,email:string): Promise<void> {  
-        this.getSignupNameInput =this.page.locator("[data-qa='signup-name']");
-        this.getSignupEmailInput =this.page.locator("[data-qa='signup-email']");
-        this.getSignupButton =this.page.locator("[data-qa='signup-button']");
+    public async signup(name: string, email: string): Promise<void> {
+        this.getSignupNameInput = this.page.locator("[data-qa='signup-name']");
+        this.getSignupEmailInput = this.page.locator("[data-qa='signup-email']");
+        this.getSignupButton = this.page.locator("[data-qa='signup-button']");
 
         await this.getSignupNameInput.fill(name);
         await this.getSignupEmailInput.fill(email);
@@ -46,4 +46,4 @@ export class LoginPage extends BasePage{
     }
 }
 
-export default LoginPage
+export default LoginPage;

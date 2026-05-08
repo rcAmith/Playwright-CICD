@@ -1,28 +1,41 @@
 {
   "name": "e-commerce_playwright",
   "version": "1.0.0",
-  "description": "Playwright Framework with typescript",
-  "main": "index.js",
-  "Author": "Mostafa Mohab",
+  "description": "Playwright end-to-end tests for Automation Exercise registration and login flows.",
+  "private": true,
   "scripts": {
-    "test": "npx playwright test src/tests --headed",
-    "test:ci": "playwright test src/tests --project=chromium"
+    "test": "playwright test --project=chromium",
+    "test:headed": "playwright test --project=chromium --headed",
+    "test:all": "playwright test",
+    "test:ci": "playwright test --project=chromium",
+    "test:debug": "playwright test --project=chromium --debug",
+    "test:ui": "playwright test --ui",
+    "typecheck": "tsc --noEmit",
+    "report": "playwright show-report reports/playwright-report",
+    "allure:clean": "node -e \"const fs = require('fs'); for (const path of ['allure-results', 'reports/allure-report']) fs.rmSync(path, { recursive: true, force: true });\"",
+    "allure:generate": "allure generate allure-results --clean -o reports/allure-report",
+    "allure:open": "allure open reports/allure-report",
+    "allure:serve": "allure serve allure-results",
+    "install:browsers": "playwright install"
   },
-  "keywords": [],
-  "author": "mosta <mostafa_mohab18@hotmail.com>",
+  "keywords": [
+    "playwright",
+    "typescript",
+    "e2e",
+    "allure"
+  ],
+  "author": "Mostafa Mohab <mostafa_mohab18@hotmail.com>",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mostafamohab/E-Commerce_Playwright.git"
+  },
+  "packageManager": "npm@11.11.0",
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@types/node": "^22.10.1",
-    "@types/supertest": "^6.0.3",
     "allure-commandline": "^2.32.0",
     "allure-playwright": "^3.0.7",
-    "playwright": "^1.49.1",
-    "supertest": "^7.1.4",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
-  },
-  "dependencies": {
-    "@playwright/test": "^1.50.0"
-  },
-  "repository": "https://github.com/mostafamohab/E-Commerce_Playwright.git"
+    "typescript": "^5.9.3"
+  }
 }

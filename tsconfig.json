@@ -1,18 +1,22 @@
-{ 
-"compilerOptions": {
-  "target": "ES6",
-  "module": "commonjs",
-  "strict": true,
-  "esModuleInterop": true,
-  "skipLibCheck": true,
-  "forceConsistentCasingInFileNames": true,
-  "outDir": "./dist",
-  "rootDir": "./src",
-  "types": ["node"]
-},
-"include": [
-  "src/tests/*.ts"
-],
-"exclude": [
-  "node_modules"
-]}
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "reports",
+    "test-results",
+    "allure-results",
+    "allure-report"
+  ]
+}
