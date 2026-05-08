@@ -1,0 +1,28 @@
+{
+  "name": "e-commerce_playwright",
+  "version": "1.0.0",
+  "description": "Playwright Framework with typescript",
+  "main": "index.js",
+  "Author": "Mostafa Mohab",
+  "scripts": {
+    "test": "npx playwright test src/tests --headed",
+    "test:ci": "playwright test src/tests --project=chromium"
+  },
+  "keywords": [],
+  "author": "mosta <mostafa_mohab18@hotmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/supertest": "^6.0.3",
+    "allure-commandline": "^2.32.0",
+    "allure-playwright": "^3.0.7",
+    "playwright": "^1.49.1",
+    "supertest": "^7.1.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.50.0"
+  },
+  "repository": "https://github.com/mostafamohab/E-Commerce_Playwright.git"
+}
