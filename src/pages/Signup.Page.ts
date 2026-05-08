@@ -52,14 +52,14 @@ export class SignupPage extends BasePage{
         this.getCreateAccountButton =this.page.locator("//*[@data-qa='create-account']");
         
         await this.getGenderMaleButton.check();
-        await this.getPasswordInput.fill("Password123");
+        await this.getPasswordInput.fill(password);
         await this.getDaysList.selectOption({value: "30"});
         await this.getMonthsList.selectOption({value: "1"});
         await this.getYearsList.selectOption({value: '1994'});
         await this.getNewsletterCheckbox.check();
         await this.getOfferCheckbox.check();
-        await this.getFirstNameInput.fill("Mostafa");
-        await this.getLastNameInput.fill("Mohab");
+        await this.getFirstNameInput.fill("Auto");
+        await this.getLastNameInput.fill("bot");
         await this.getCompanyInput.fill("Cairo");
         await this.getAddressInput.fill("Cairo , EG");
         await this.getCountryList.selectOption({value : 'United States'});

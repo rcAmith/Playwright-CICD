@@ -17,7 +17,8 @@ test.describe("Register User", () => {
     basetest=new BaseTest();
     await basetest.setup();// Set up the browser, page, and page objects
 
-    randomEmail = generateRandomEmail();
+    // randomEmail = generateRandomEmail();
+    randomEmail = 'autobot_alpha77@example.com';
     await basetest.loginPage.navigate();
 
   });
@@ -36,13 +37,13 @@ test.describe("Register User", () => {
     await expect(basetest.loginPage.getElementByText("New User Signup!")).toBeVisible();
 
     //3- Login with valid Random username and email address
-    await basetest.loginPage.signup('Mohamed',generateRandomEmail())
+    await basetest.loginPage.signup('Autobot',generateRandomEmail())
 
     //4- verify "Enter Account Information" is visible
     await expect(basetest.signupPage.getElementByText("Enter Account Information")).toBeVisible();
 
     //5- Fill All Account Details
-    await basetest.signupPage.fillAccountInfoDetails('mohamed','Password123');
+    await basetest.signupPage.fillAccountInfoDetails('AutoBotAlpha','Password123');
 
     //6- Click Create Account Button
     await expect(basetest.accountcreatedPage.getAccountCreatedText).toBeVisible(({ timeout: 10000 }));
@@ -50,8 +51,8 @@ test.describe("Register User", () => {
     //7- Click on Continue Button
     await (basetest.accountcreatedPage.getContinueButton).click();
 
-    //8- Verify that 'Logged in as Mohamed' in homepage
-    expect(basetest.homePage.getElementByText("Logged in as Mohamed")).toBeVisible();
+    //8- Verify that 'Logged in as Autobot' in homepage
+    expect(basetest.homePage.getElementByText("Logged in as Autobot")).toBeVisible();
 
     //9- Click on 'Delete Account' from page header
     await basetest.homePage.getElementByText("Delete Account").click();;
