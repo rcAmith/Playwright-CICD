@@ -55,12 +55,19 @@ jobs:
       - name: Run TypeScript check
         run: npm run typecheck
 
-      - name: Run Playwright tests
+      - name: Run UI Tests
         shell: bash
         run: |
           set -o pipefail
           mkdir -p reports
-          npm run test:ci 2>&1 | tee reports/playwright-test.log
+          npm run test:ui 2>&1 | tee reports/ui-test.log
+
+      - name: Run API Tests
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p reports
+          npm run test:api 2>&1 | tee reports/api-test.log
 
       - name: Generate Allure report
         if: ${{ always() }}
