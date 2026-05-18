@@ -5,11 +5,16 @@
   "private": true,
   "scripts": {
     "test": "playwright test --project=ui-chromium",
+    "test:ui:chromium": "playwright test --project=ui-chromium",
     "test:headed": "playwright test --project=ui-chromium --headed",
     "test:all": "playwright test",
     "test:ui": "playwright test --project=ui-chromium --project=ui-firefox --project=ui-webkit",
     "test:api": "playwright test --project=api",
-    "test:ci": "playwright test",
+    "test:smoke": "playwright test --project=ui-chromium --project=api --grep @smoke",
+    "test:regression": "playwright test --grep @regression",
+    "test:ci": "npm run ci:pr",
+    "ci:pr": "npm run typecheck && npm run test:api && npm run test:ui:chromium",
+    "ci:full": "npm run typecheck && npm run test:api && npm run test:ui",
     "test:debug": "playwright test --project=ui-chromium --debug",
     "test:ui-debug": "playwright test --project=ui-chromium --debug",
     "test:api-debug": "playwright test --project=api --debug",
@@ -20,7 +25,8 @@
     "allure:generate": "allure generate allure-results --clean -o reports/allure-report",
     "allure:open": "allure open reports/allure-report",
     "allure:serve": "allure serve allure-results",
-    "install:browsers": "playwright install"
+    "install:browsers": "playwright install",
+    "install:browsers:chromium": "playwright install chromium"
   },
   "keywords": [
     "playwright",

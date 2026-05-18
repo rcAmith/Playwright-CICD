@@ -2,15 +2,214 @@ name: Playwright Tests
 
 on:
   push:
+    branches:
+      - main
+      - master
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * *'
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
-    name: Run Playwright tests
+  typecheck:
+    name: TypeScript check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run TypeScript check
+        run: npm run typecheck
+
+  api:
+    name: API tests
+    needs: typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Setup Java for Allure
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run API tests
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p reports
+          npm run test:api 2>&1 | tee reports/api-test.log
+
+      - name: Generate API Allure report
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          if [ -d allure-results ]; then
+            npm run allure:generate
+          else
+            echo "No allure-results directory was created."
+          fi
+
+      - name: Upload API Playwright artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-artifacts-api
+          path: |
+            reports/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload API Allure artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: allure-report-api
+          path: |
+            allure-results/
+            reports/allure-report/
+          if-no-files-found: warn
+          retention-days: 14
+
+  ui-chromium:
+    name: UI tests - Chromium PR gate
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: true
+      HEADLESS: true
+      BASE_URL: ${{ secrets.BASE_URL }}
+      LOGIN_EMAIL: ${{ secrets.LOGIN_EMAIL }}
+      LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
+      LOGIN_USER_NAME: ${{ secrets.LOGIN_USER_NAME }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Setup Java for Allure
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Cache Chromium browser
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-chromium-
+            ${{ runner.os }}-playwright-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Validate UI secrets
+        shell: bash
+        run: |
+          missing=false
+          for name in LOGIN_EMAIL LOGIN_PASSWORD LOGIN_USER_NAME; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is required for UI login tests."
+              missing=true
+            fi
+          done
+          if [ "$missing" = true ]; then
+            exit 1
+          fi
+
+      - name: Run Chromium UI tests
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p reports
+          npm run test:ui:chromium 2>&1 | tee reports/ui-chromium-test.log
+
+      - name: Generate Chromium UI Allure report
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          if [ -d allure-results ]; then
+            npm run allure:generate
+          else
+            echo "No allure-results directory was created."
+          fi
+
+      - name: Upload Chromium UI Playwright artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-artifacts-ui-chromium
+          path: |
+            reports/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload Chromium UI Allure artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: allure-report-ui-chromium
+          path: |
+            allure-results/
+            reports/allure-report/
+          if-no-files-found: warn
+          retention-days: 14
+
+  ui-all-browsers:
+    name: UI tests - full browser regression
+    if: ${{ github.event_name != 'pull_request' }}
+    needs: typecheck
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -52,24 +251,28 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
-      - name: Run TypeScript check
-        run: npm run typecheck
+      - name: Validate UI secrets
+        shell: bash
+        run: |
+          missing=false
+          for name in LOGIN_EMAIL LOGIN_PASSWORD LOGIN_USER_NAME; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is required for UI login tests."
+              missing=true
+            fi
+          done
+          if [ "$missing" = true ]; then
+            exit 1
+          fi
 
-      - name: Run UI Tests
+      - name: Run all-browser UI tests
         shell: bash
         run: |
           set -o pipefail
           mkdir -p reports
-          npm run test:ui 2>&1 | tee reports/ui-test.log
+          npm run test:ui 2>&1 | tee reports/ui-all-browsers-test.log
 
-      - name: Run API Tests
-        shell: bash
-        run: |
-          set -o pipefail
-          mkdir -p reports
-          npm run test:api 2>&1 | tee reports/api-test.log
-
-      - name: Generate Allure report
+      - name: Generate full UI Allure report
         if: ${{ always() }}
         shell: bash
         run: |
@@ -79,24 +282,24 @@ jobs:
             echo "No allure-results directory was created."
           fi
 
-      - name: Upload Playwright artifacts
+      - name: Upload full UI Playwright artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v7
         with:
-          name: playwright-artifacts
+          name: playwright-artifacts-ui-all-browsers
           path: |
             reports/
             test-results/
           if-no-files-found: warn
-          retention-days: 30
+          retention-days: 14
 
-      - name: Upload Allure artifacts
+      - name: Upload full UI Allure artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v7
         with:
-          name: allure-report
+          name: allure-report-ui-all-browsers
           path: |
             allure-results/
             reports/allure-report/
           if-no-files-found: warn
-          retention-days: 30
+          retention-days: 14
