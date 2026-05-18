@@ -1,8 +1,8 @@
-import { Locator, Page } from "@playwright/test";
-import { BasePage} from "./BasePage.Page";
+import { Locator, Page } from '@playwright/test';
+import { BasePage } from './base.page';
 
 export class HomePage extends BasePage {
-    private getDeleteAccountButton!: Locator;
+    private readonly deleteAccountLink = this.page.getByRole('link', { name: 'Delete Account' });
 
     constructor(page: Page) {
         super(page);
@@ -13,8 +13,7 @@ export class HomePage extends BasePage {
     }
 
     public async clickDeleteAccountButton(): Promise<void> {
-        this.getDeleteAccountButton = this.page.getByRole('link', { name: 'Delete Account' });
-        await this.getDeleteAccountButton.click();
+        await this.deleteAccountLink.click();
     }
 
     public async navigate(): Promise<void> {

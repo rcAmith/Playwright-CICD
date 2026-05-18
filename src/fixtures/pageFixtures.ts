@@ -1,9 +1,9 @@
 import { test as base, expect } from '@playwright/test';
-import AccountCreatedPage from '../pages/AccountCreated.Page';
-import AccountDeletedPage from '../pages/AccountDeleted.Page';
-import HomePage from '../pages/Home.Page';
-import LoginPage from '../pages/Login.Page';
-import SignupPage from '../pages/Signup.Page';
+import AccountCreatedPage from '../pages/account-created.page';
+import AccountDeletedPage from '../pages/account-deleted.page';
+import HomePage from '../pages/home.page';
+import LoginPage from '../pages/login.page';
+import SignupPage from '../pages/signup.page';
 
 type PageFixtures = {
   accountCreatedPage: AccountCreatedPage;
