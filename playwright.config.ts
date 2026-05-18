@@ -36,7 +36,7 @@ export default defineConfig({
     {
       name: 'ui-chromium',
       testDir: './src/tests',
-      testMatch: ['**/login.spec.ts', '**/register.spec.ts'],
+      testMatch: '**/*.ui.spec.ts',
       use: {
         ...devices['Desktop Chrome']
       }
@@ -44,7 +44,7 @@ export default defineConfig({
     {
       name: 'ui-firefox',
       testDir: './src/tests',
-      testMatch: ['**/login.spec.ts', '**/register.spec.ts'],
+      testMatch: '**/*.ui.spec.ts',
       use: {
         ...devices['Desktop Firefox']
       }
@@ -52,7 +52,7 @@ export default defineConfig({
     {
       name: 'ui-webkit',
       testDir: './src/tests',
-      testMatch: ['**/login.spec.ts', '**/register.spec.ts'],
+      testMatch: '**/*.ui.spec.ts',
       use: {
         ...devices['Desktop Safari']
       }
@@ -60,6 +60,7 @@ export default defineConfig({
     {
       name: 'api',
       testDir: './src/tests/api',
+      testMatch: '**/*.api.spec.ts',
       use: {}
     }
   ]

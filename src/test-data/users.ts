@@ -5,15 +5,6 @@ export const validLoginUser = {
 };
 
 export const invalidLoginUser = {
-  email: process.env.INVALID_LOGIN_EMAIL || '',
-  password: validLoginUser.password
+  email: process.env.INVALID_LOGIN_EMAIL || 'invalid-user@example.com',
+  password: process.env.INVALID_LOGIN_PASSWORD || 'InvalidPassword123'
 };
-
-export function createRegistrationUser() {
-  return {
-    signupName: 'Autobot',
-    accountName: 'AutoBotAlpha',
-    email: `autobot_${Date.now()}_${Math.random().toString(36).slice(2, 8)}@example.com`,
-    password: 'Password123'
-  };
-}

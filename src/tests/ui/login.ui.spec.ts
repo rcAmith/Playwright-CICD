@@ -1,13 +1,18 @@
-import { test, expect } from '../fixtures/pageFixtures';
-import { invalidLoginUser, validLoginUser } from '../test-data/users';
+import { test, expect } from '../../fixtures/pageFixtures';
+import { validateRequiredEnvVars } from '../../config/envValidation';
+import { invalidLoginUser, validLoginUser } from '../../test-data/users';
 
 test.describe("Login User", () => {
+
+    test.beforeAll(() => {
+        validateRequiredEnvVars(['LOGIN_EMAIL', 'LOGIN_PASSWORD', 'LOGIN_USER_NAME'], 'UI login tests');
+    });
 
     test.beforeEach(async ({ loginPage }) => {
         await loginPage.navigate();
     });
 
-    test('user can login with valid credentials', async ({ loginPage, homePage }) => {
+    test('@smoke @ui user can login with valid credentials', async ({ loginPage, homePage }) => {
         await loginPage.login(validLoginUser.email, validLoginUser.password);
     
         const isLoggedIn = homePage.loggedInUser(validLoginUser.name);
@@ -15,7 +20,7 @@ test.describe("Login User", () => {
         await expect(isLoggedIn).toBeVisible();
     });
 
-    test('user can login with invalid credentials', async ({ loginPage }) => {
+    test('@regression @ui user can login with invalid credentials', async ({ loginPage }) => {
         await loginPage.login(invalidLoginUser.email, invalidLoginUser.password);
 
         const hasError = loginPage.invalidLoginError;
