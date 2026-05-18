@@ -1,23 +1,30 @@
 # E-Commerce Playwright
 
-Playwright end-to-end tests for the Automation Exercise registration and login flows.
+TypeScript Playwright automation for the Automation Exercise e-commerce site. The framework covers browser UI flows with Page Object Model classes and API coverage with Playwright request fixtures.
 
 ## Tech Stack
 
 - TypeScript
 - Playwright Test
 - Page Object Model
-- Allure reports
+- Playwright API testing
+- HTML, JUnit, and Allure reports
 - GitHub Actions
+- npm
 
-## Project Structure
+## Architecture
 
 ```text
 src/
-  config/          Shared test configuration and environment defaults
-  pages/           Page objects and reusable page actions
-  tests/           Playwright test specs
-.github/workflows/ CI pipeline
+  config/          Runtime config and environment validation
+  fixtures/        Playwright fixtures for page objects and API services
+  pages/           UI Page Object Model classes
+  services/        API service wrapper
+  test-data/       Typed test data factories and login user data
+  tests/ui/        UI specs named *.ui.spec.ts
+  tests/api/       API specs named *.api.spec.ts
+  utils/           API payload helpers
+.github/workflows/ GitHub Actions CI pipeline
 ```
 
 ## Requirements
@@ -26,68 +33,71 @@ src/
 - npm
 - Java 17 or newer for generating/opening Allure reports locally
 
-This project uses `package-lock.json` and npm. Use npm commands for consistent local and CI installs.
-
-## Setup
+Install dependencies and browsers:
 
 ```bash
 npm ci
 npm run install:browsers
 ```
 
+For a faster Chromium-only setup:
+
+```bash
+npm run install:browsers:chromium
+```
+
 ## Environment Variables
 
-Defaults are defined in `src/config/testConfig.ts`. Use `.env.example` as a reference for local values, then set variables in your terminal or CI settings.
+Defaults are defined in `src/config/testConfig.ts`. Use `.env.example` as a reference, then set values in your shell or CI secrets.
 
-Useful variables:
+Important variables:
 
-- `BASE_URL`: application URL, defaults to `https://www.automationexercise.com`
-- `HEADLESS`: `true` or `false`, defaults to `true`
-- `VIDEO`: local video mode, defaults to `off`; CI uses `retain-on-failure`
-- `WORKERS`: number of parallel workers, defaults to `3` locally and `1` in CI
-- `RETRIES`: retry count, defaults to `0` locally and `1` in CI
+- `BASE_URL`: defaults to `https://www.automationexercise.com`
+- `HEADLESS`: defaults to `true`
+- `VIDEO`: defaults to `off` locally and `retain-on-failure` in CI
+- `WORKERS`: defaults to `3` locally and `1` in CI
+- `RETRIES`: defaults to `0` locally and `1` in CI
 - `SLOW_MO`: Playwright launch slow motion in milliseconds
-- `LOGIN_EMAIL`, `LOGIN_PASSWORD`, `LOGIN_USER_NAME`: valid login test account
-- `INVALID_LOGIN_EMAIL`: invalid login test email
+- `LOGIN_EMAIL`, `LOGIN_PASSWORD`, `LOGIN_USER_NAME`: required for UI login tests
+- `INVALID_LOGIN_EMAIL`: invalid email used by negative login tests
+- `INVALID_LOGIN_PASSWORD`: optional invalid password used by negative login tests
 
-PowerShell example:
+Never commit real credentials. Store real login values in local environment variables or GitHub Actions secrets.
 
-```powershell
-$env:HEADLESS="false"
-$env:LOGIN_EMAIL="your-valid-test-user@example.com"
-$env:LOGIN_PASSWORD="your-test-password"
-npm run test:headed
-```
-
-## Run Tests Locally
+## Common Commands
 
 ```bash
-npm test
+npm test                    # Chromium UI tests
+npm run test:ui:chromium    # Chromium UI tests explicitly
+npm run test:api            # API tests only
+npm run test:ui             # Chromium, Firefox, and WebKit UI tests
+npm run test:smoke          # Fast smoke subset
+npm run test:regression     # Regression-tagged tests
+npm run ci:pr               # Local PR-style check
+npm run ci:full             # Local full check
+npm run test:headed         # Headed Chromium UI
+npm run test:debug          # Playwright debug mode
+npm run test:ui-ui          # Playwright UI mode
+npm run typecheck           # TypeScript validation
 ```
 
-Helpful scripts:
+## Reports And Debugging
 
-```bash
-npm run test:headed
-npm run test:all
-npm run test:debug
-npm run test:ui
-npm run typecheck
-```
+Playwright writes reports and failure artifacts to ignored output folders:
 
-## Playwright Report
+- `reports/playwright-report/`: HTML report
+- `reports/junit-results.xml`: JUnit report
+- `allure-results/`: raw Allure results
+- `reports/allure-report/`: generated Allure report
+- `test-results/`: traces, screenshots, and videos
 
-After a test run, open the Playwright HTML report:
+Open the Playwright report:
 
 ```bash
 npm run report
 ```
 
-## Allure Report
-
-All Playwright runs now write Allure result files to `allure-results/`.
-
-Generate and open the local Allure report:
+Generate and open Allure locally:
 
 ```bash
 npm run allure:clean
@@ -96,34 +106,46 @@ npm run allure:generate
 npm run allure:open
 ```
 
-For a quick generated temporary report:
+Debugging tips:
 
-```bash
-npm run allure:serve
-```
+- Use `npm run test:headed` to watch the browser.
+- Use `npm run test:debug` to inspect locators and actions.
+- Use traces from `test-results/` or CI artifacts for failed tests.
+- Use `test.step()` output in reports to follow API workflows.
 
-If Allure commands fail locally, install Java 17+ and make sure `java` is available in your terminal.
+## Test Organization
 
-## CI Pipeline
+- UI specs live in `src/tests/ui/` and use `*.ui.spec.ts`.
+- API specs use `*.api.spec.ts`.
+- Smoke tests include `@smoke`.
+- Regression tests include `@regression`.
+- Platform tags use `@ui` and `@api`.
 
-The GitHub Actions workflow runs on:
+New account-creating tests should clean up resources with `try/finally`.
 
-- every push
-- every pull request
-- manual `workflow_dispatch`
+## CI Strategy
 
-The pipeline:
+GitHub Actions runs:
 
-- checks out the repository
-- installs Node.js with npm caching
-- installs Java for Allure
+- Pull requests: TypeScript check, API tests, and Chromium UI tests.
+- `main`/`master`, manual dispatch, and nightly schedule: TypeScript check, API tests, and full browser UI regression.
+
+The workflow:
+
+- cancels stale runs for the same branch or PR
+- uses npm caching
 - caches Playwright browsers
-- runs `npm ci`
-- installs Playwright browsers with system dependencies
-- runs TypeScript checks
-- runs Chromium tests headlessly
-- generates Playwright, JUnit, and Allure reports
-- uploads `reports/`, `test-results/`, `allure-results/`, and the generated Allure report as artifacts
-- keeps traces, screenshots, and videos for failed CI tests
+- installs only Chromium for PR UI tests
+- installs all browsers for full UI regression
+- uploads job-specific Playwright and Allure artifacts
+- retains failure screenshots, traces, and videos
 
-Download the `allure-report` artifact from a workflow run to view the CI Allure report.
+Required CI secrets for UI tests:
+
+- `LOGIN_EMAIL`
+- `LOGIN_PASSWORD`
+- `LOGIN_USER_NAME`
+
+Optional CI secret:
+
+- `BASE_URL`
