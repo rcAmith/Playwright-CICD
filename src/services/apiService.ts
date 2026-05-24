@@ -1,6 +1,9 @@
-import { APIRequestContext, expect } from '@playwright/test';
+import { APIRequestContext, expect } from "@playwright/test";
 
-const API_BASE_URL = process.env.API_BASE_URL || 'https://automationexercise.com/api';
+const API_BASE_URL =
+  process.env.API_BASE_URL || "https://automationexercise.com/api";
+
+type HttpMethod = "get" | "post" | "put" | "delete";
 
 export interface ApiResponse {
   status: number;
@@ -17,127 +20,83 @@ export interface ApiRequestOptions {
 export class ApiService {
   constructor(private request: APIRequestContext) {}
 
-  /**
-   * Perform a GET request
-   */
-  async get(endpoint: string, params?: Record<string, string>, options?: ApiRequestOptions): Promise<ApiResponse> {
+  private async sendRequest(
+    method: HttpMethod,
+    endpoint: string,
+    payload?: Record<string, string | number | boolean>,
+    options?: ApiRequestOptions,
+  ): Promise<ApiResponse> {
     const url = new URL(`${API_BASE_URL}${endpoint}`);
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        url.searchParams.append(key, value);
+
+    let data;
+
+    // GET uses query params
+    if (method === "get" && payload) {
+      Object.entries(payload).forEach(([key, value]) => {
+        url.searchParams.append(key, String(value));
       });
     }
 
-    const response = await this.request.get(url.toString(), {
+    // Others use request body
+    else if (payload) {
+      const body = new URLSearchParams();
+
+      Object.entries(payload).forEach(([key, value]) => {
+        body.append(key, String(value));
+      });
+
+      data = body.toString();
+    }
+
+    const response = await this.request[method](url.toString(), {
+      data,
       timeout: options?.timeout || 30000,
-      headers: options?.headers || {}
+
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+
+        ...options?.headers,
+      },
     });
 
-    const data = await response.json().catch(() => ({}));
+    const responseData = await response.json().catch(() => ({}));
+
     return {
       status: response.status(),
-      ...data
+      ...responseData,
     };
   }
 
-  /**
-   * Perform a POST request with form-urlencoded body
-   */
+  async get(
+    endpoint: string,
+    params?: Record<string, string>,
+    options?: ApiRequestOptions,
+  ) {
+    return this.sendRequest("get", endpoint, params, options);
+  }
+
   async post(
     endpoint: string,
     payload?: Record<string, string | number | boolean>,
-    options?: ApiRequestOptions
-  ): Promise<ApiResponse> {
-    const url = `${API_BASE_URL}${endpoint}`;
-    
-    // Convert payload to form-urlencoded format
-    const body = new URLSearchParams();
-    if (payload) {
-      Object.entries(payload).forEach(([key, value]) => {
-        body.append(key, String(value));
-      });
-    }
-
-    const response = await this.request.post(url, {
-      data: body.toString(),
-      timeout: options?.timeout || 30000,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        ...options?.headers
-      }
-    });
-
-    const data = await response.json().catch(() => ({}));
-    return {
-      status: response.status(),
-      ...data
-    };
+    options?: ApiRequestOptions,
+  ) {
+    return this.sendRequest("post", endpoint, payload, options);
   }
 
-  /**
-   * Perform a PUT request with form-urlencoded body
-   */
   async put(
     endpoint: string,
     payload?: Record<string, string | number | boolean>,
-    options?: ApiRequestOptions
-  ): Promise<ApiResponse> {
-    const url = `${API_BASE_URL}${endpoint}`;
-    
-    const body = new URLSearchParams();
-    if (payload) {
-      Object.entries(payload).forEach(([key, value]) => {
-        body.append(key, String(value));
-      });
-    }
-
-    const response = await this.request.put(url, {
-      data: body.toString(),
-      timeout: options?.timeout || 30000,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        ...options?.headers
-      }
-    });
-
-    const data = await response.json().catch(() => ({}));
-    return {
-      status: response.status(),
-      ...data
-    };
+    options?: ApiRequestOptions,
+  ) {
+    return this.sendRequest("put", endpoint, payload, options);
   }
 
-  /**
-   * Perform a DELETE request with form-urlencoded body
-   */
   async delete(
     endpoint: string,
     payload?: Record<string, string | number | boolean>,
-    options?: ApiRequestOptions
-  ): Promise<ApiResponse> {
-    const url = `${API_BASE_URL}${endpoint}`;
-    
-    const body = new URLSearchParams();
-    if (payload) {
-      Object.entries(payload).forEach(([key, value]) => {
-        body.append(key, String(value));
-      });
-    }
-
-    const response = await this.request.delete(url, {
-      data: body.toString(),
-      timeout: options?.timeout || 30000,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        ...options?.headers
-      }
-    });
-
-    const data = await response.json().catch(() => ({}));
-    return {
-      status: response.status(),
-      ...data
-    };
+    options?: ApiRequestOptions,
+  ) {
+    return this.sendRequest("delete", endpoint, payload, options);
   }
 
   /**
