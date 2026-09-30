@@ -5,6 +5,6 @@ export const validLoginUser = {
 };
 
 export const invalidLoginUser = {
-  email: process.env.INVALID_LOGIN_EMAIL || 'invalid-user@example.com',
+  email: 'invalid-user@example.com',
   password: process.env.INVALID_LOGIN_PASSWORD || 'InvalidPassword123'
 };

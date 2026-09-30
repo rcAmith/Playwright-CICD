@@ -7,11 +7,11 @@ export class AccountCreatedPage extends BasePage {
     }
 
     public get accountCreatedMessage(): Locator {
-        return this.page.getByText('Account Created!', { exact: true });
+        return this.page.getByRole('heading', { name: 'Account Created!' });
     }
     
     public get continueButton(): Locator {
-        return this.page.locator("[data-qa='continue-button']");
+        return this.page.getByTestId('continue-button');
     }
 
     public async navigate(): Promise<void> {

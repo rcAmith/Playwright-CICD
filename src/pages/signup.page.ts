@@ -20,23 +20,23 @@ export type SignupAccountDetails = {
 };
 
 export class SignupPage extends BasePage {
-    private readonly genderMaleRadio = this.page.locator('#id_gender1');
-    private readonly passwordInput = this.page.locator('#password');
-    private readonly daysSelect = this.page.locator('#days');
-    private readonly monthsSelect = this.page.locator('#months');
-    private readonly yearsSelect = this.page.locator('#years');
-    private readonly newsletterCheckbox = this.page.locator('#newsletter');
-    private readonly offerCheckbox = this.page.locator('#optin');
-    private readonly firstNameInput = this.page.locator('#first_name');
-    private readonly lastNameInput = this.page.locator('#last_name');
-    private readonly companyInput = this.page.locator("[data-qa='company']");
-    private readonly addressInput = this.page.locator("[data-qa='address']");
-    private readonly countrySelect = this.page.locator("[data-qa='country']");
-    private readonly stateInput = this.page.locator("[data-qa='state']");
-    private readonly cityInput = this.page.locator("[data-qa='city']");
-    private readonly zipCodeInput = this.page.locator("[data-qa='zipcode']");
-    private readonly mobileNumberInput = this.page.locator("[data-qa='mobile_number']");
-    private readonly createAccountButton = this.page.locator("[data-qa='create-account']");
+    private readonly genderMaleRadio = this.page.getByLabel('Mr.');
+    private readonly passwordInput = this.page.getByTestId('password');
+    private readonly daysSelect = this.page.getByTestId('days');
+    private readonly monthsSelect = this.page.getByTestId('months');
+    private readonly yearsSelect = this.page.getByTestId('years');
+    private readonly newsletterCheckbox = this.page.getByLabel(/newsletter/i);
+    private readonly offerCheckbox = this.page.getByLabel(/special offers/i);
+    private readonly firstNameInput = this.page.getByTestId('first_name');
+    private readonly lastNameInput = this.page.getByTestId('last_name');
+    private readonly companyInput = this.page.getByTestId('company');
+    private readonly addressInput = this.page.getByTestId('address');
+    private readonly countrySelect = this.page.getByTestId('country');
+    private readonly stateInput = this.page.getByTestId('state');
+    private readonly cityInput = this.page.getByTestId('city');
+    private readonly zipCodeInput = this.page.getByTestId('zipcode');
+    private readonly mobileNumberInput = this.page.getByTestId('mobile_number');
+    private readonly createAccountButton = this.page.getByTestId('create-account');
 
     constructor(page: Page) {
         super(page);
@@ -47,9 +47,11 @@ export class SignupPage extends BasePage {
     }
 
     public get accountInformationHeading(): Locator {
-        return this.page.getByText('Enter Account Information', { exact: true });
+        return this.page.getByRole('heading', { name: 'Enter Account Information' });
     }
-
+    public get existingEmailError(): Locator {
+        return this.page.getByText('Email Address already exist!', { exact: true });
+    }
     public async fillAccountInfoDetails(details: SignupAccountDetails): Promise<void> {
         await this.genderMaleRadio.check();
         await this.passwordInput.fill(details.password);

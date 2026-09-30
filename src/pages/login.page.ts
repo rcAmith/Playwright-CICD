@@ -2,12 +2,13 @@ import { Locator, Page } from '@playwright/test';
 import { BasePage } from './base.page';
 
 export class LoginPage extends BasePage {
-    private readonly loginEmailInput = this.page.locator("[data-qa='login-email']");
-    private readonly loginPasswordInput = this.page.locator("[data-qa='login-password']");
-    private readonly loginButton = this.page.locator("[data-qa='login-button']");
-    private readonly signupNameInput = this.page.locator("[data-qa='signup-name']");
-    private readonly signupEmailInput = this.page.locator("[data-qa='signup-email']");
-    private readonly signupButton = this.page.locator("[data-qa='signup-button']");
+    private readonly loginEmailInput = this.page.getByTestId('login-email');
+    private readonly loginPasswordInput = this.page.getByTestId('login-password');
+    private readonly loginButton = this.page.getByTestId('login-button');
+    private readonly signupNameInput = this.page.getByTestId('signup-name');
+    private readonly signupEmailInput = this.page.getByTestId('signup-email');
+    private readonly signupButton = this.page.getByTestId('signup-button');
+    private readonly logoutButton = this.page.getByRole('link', { name: /Logout/ });
 
     constructor(page: Page) {
         super(page);
@@ -18,7 +19,7 @@ export class LoginPage extends BasePage {
     }
 
     public get newUserSignupHeading(): Locator {
-        return this.page.getByText('New User Signup!', { exact: true });
+        return this.page.getByRole('heading', { name: 'New User Signup!' });
     }
 
     public get invalidLoginError(): Locator {
@@ -29,6 +30,9 @@ export class LoginPage extends BasePage {
         await this.loginEmailInput.fill(email);
         await this.loginPasswordInput.fill(password);
         await this.loginButton.click();
+    }
+    public async logout(){
+        await   this.logoutButton.click();
     }
 
     public async signup(name: string, email: string): Promise<void> {

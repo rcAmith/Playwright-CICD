@@ -1,4 +1,4 @@
-import { expect, Locator, Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 import { BasePage } from './base.page';
 
 export class AccountDeletedPage extends BasePage {
@@ -7,15 +7,15 @@ export class AccountDeletedPage extends BasePage {
     }
 
     public async verifyAccountDeleted(): Promise<void> {
-        await expect(this.accountDeletedMessage).toBeVisible();
+        await this.accountDeletedMessage.waitFor({ state: 'visible' });
     }
 
     public get continueButton(): Locator {
-        return this.page.locator("[data-qa='continue-button']");
+        return this.page.getByTestId('continue-button');
     }
 
     public get accountDeletedMessage(): Locator {
-        return this.page.getByText('Account Deleted!', { exact: true });
+        return this.page.getByRole('heading', { name: 'Account Deleted!' });
     }
 
     public async navigate(): Promise<void> {

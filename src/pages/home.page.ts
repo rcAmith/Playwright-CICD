@@ -2,7 +2,8 @@ import { Locator, Page } from '@playwright/test';
 import { BasePage } from './base.page';
 
 export class HomePage extends BasePage {
-    private readonly deleteAccountLink = this.page.getByRole('link', { name: 'Delete Account' });
+    private readonly contactUsLink = this.page.getByRole('link', { name: /Contact us/i });
+    private readonly deleteAccountLink = this.page.getByRole('link', { name: /Delete Account/ });
 
     constructor(page: Page) {
         super(page);
@@ -18,6 +19,9 @@ export class HomePage extends BasePage {
 
     public async navigate(): Promise<void> {
         await super.navigate();
+    }
+    public async clickContactUs(){
+        await this.contactUsLink.click();
     }
 }
 

@@ -27,5 +27,5 @@ export const testConfig = {
   retries: readNumber('RETRIES', isCI ? 1 : 0),
   slowMo: readNumber('SLOW_MO', 0),
   video: (process.env.VIDEO || defaultVideo) as 'off' | 'on' | 'retain-on-failure' | 'on-first-retry',
-  workers: readNumber('WORKERS', isCI ? 1 : 3)
+  workers: readNumber('WORKERS', isCI ? 2 : 2)
 };

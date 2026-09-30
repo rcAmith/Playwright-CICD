@@ -2,24 +2,24 @@ import { test, expect } from '../../fixtures/apiFixtures';
 import { buildAccountPayload, buildDeletePayload, buildLoginPayload, generateTestEmail } from '../../utils/apiHelpers';
 
 test.describe('API: Verify Login', () => {
-  test('@smoke @api Verify login with valid credentials should return 200', async ({ apiService }) => {
+  test('@smoke @api Verify login with valid credentials should return 200', async ({ apiService, accountService ,authService}) => {
     const email = generateTestEmail();
     const password = 'Password123';
     let created = false;
 
     try {
-      const createResponse = await apiService.post('/createAccount', buildAccountPayload(email, password));
+      const createResponse = await accountService.createUser(email, password);
       created = createResponse.responseCode === 201;
       apiService.expectResponseCode(createResponse, 201);
 
-      const response = await apiService.post('/verifyLogin', buildLoginPayload(email, password));
+      const response = await authService.login({email, password});
 
       apiService.expectStatus(response, 200);
       apiService.expectResponseCode(response, 200);
       expect(response.message).toContain('User exists');
     } finally {
       if (created) {
-        await apiService.delete('/deleteAccount', buildDeletePayload(email, password));
+        await accountService.deleteUser(email,password);
       }
     }
   });
@@ -40,8 +40,8 @@ test.describe('API: Verify Login', () => {
     expect(response.message).toContain('email or password parameter is missing');
   });
 
-  test('@regression @api Verify login with invalid credentials should return 404', async ({ apiService }) => {
-    const response = await apiService.post('/verifyLogin', buildLoginPayload('nonexistent@example.com', 'wrongpassword'));
+  test('@regression @api Verify login with invalid credentials should return 404', async ({ apiService ,authService}) => {
+    const response = await authService.login({ email: 'nonexistent@example.com', password: 'wrongpassword' });
 
     apiService.expectStatus(response, 200);
     apiService.expectResponseCode(response, 404);

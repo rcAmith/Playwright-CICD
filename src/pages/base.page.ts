@@ -19,4 +19,7 @@ export class BasePage implements BasePageContract {
   public getElementByText(text: string): Locator {
     return this.page.getByText(text);
   }
+  public async getCurrentURL(): Promise<string> {
+    return this.page.url();
+  }
 }

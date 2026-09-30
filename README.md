@@ -59,8 +59,6 @@ Important variables:
 - `RETRIES`: defaults to `0` locally and `1` in CI
 - `SLOW_MO`: Playwright launch slow motion in milliseconds
 - `LOGIN_EMAIL`, `LOGIN_PASSWORD`, `LOGIN_USER_NAME`: required for UI login tests
-- `INVALID_LOGIN_EMAIL`: invalid email used by negative login tests
-- `INVALID_LOGIN_PASSWORD`: optional invalid password used by negative login tests
 
 Never commit real credentials. Store real login values in local environment variables or GitHub Actions secrets.
 

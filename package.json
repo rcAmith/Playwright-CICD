@@ -4,7 +4,7 @@
   "description": "Playwright end-to-end tests for Automation Exercise registration and login flows.",
   "private": true,
   "scripts": {
-    "test": "playwright test --project=ui-chromium",
+    "test": "npx playwright test --project=ui-chromium",
     "test:ui:chromium": "playwright test --project=ui-chromium",
     "test:headed": "playwright test --project=ui-chromium --headed",
     "test:all": "playwright test",
@@ -20,10 +20,10 @@
     "test:api-debug": "playwright test --project=api --debug",
     "test:ui-ui": "playwright test --ui --project=ui-chromium",
     "typecheck": "tsc --noEmit",
-    "report": "playwright show-report reports/playwright-report",
-    "allure:clean": "node -e \"const fs = require('fs'); for (const path of ['allure-results', 'reports/allure-report']) fs.rmSync(path, { recursive: true, force: true });\"",
-    "allure:generate": "allure generate allure-results --clean -o reports/allure-report",
-    "allure:open": "allure open reports/allure-report",
+    "report": "playwright show-report test-results/playwright-report",
+    "allure:clean": "node -e \"const fs = require('fs'); for (const path of ['allure-results', 'test-results/allure-report']) fs.rmSync(path, { recursive: true, force: true });\"",
+    "allure:generate":"allure generate allure-results --clean -o reports/allure-report",
+    "allure:open": "allure open test-results/allure-report",
     "allure:serve": "allure serve allure-results",
     "install:browsers": "playwright install",
     "install:browsers:chromium": "playwright install chromium"
@@ -34,18 +34,13 @@
     "e2e",
     "allure"
   ],
-  "author": "Mostafa Mohab <mostafa_mohab18@hotmail.com>",
-  "license": "ISC",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mostafamohab/E-Commerce_Playwright.git"
-  },
   "packageManager": "npm@11.11.0",
   "devDependencies": {
     "@playwright/test": "^1.59.1",
     "@types/node": "^22.10.1",
     "allure-commandline": "^2.32.0",
     "allure-playwright": "^3.0.7",
+    "dotenv": "^17.4.2",
     "typescript": "^5.9.3"
   }
 }

@@ -20,41 +20,31 @@ export interface ApiRequestOptions {
 export class ApiService {
   constructor(private request: APIRequestContext) {}
 
-  private async sendRequest(
+  private async send(
     method: HttpMethod,
     endpoint: string,
-    payload?: Record<string, string | number | boolean>,
+    payload?: Record<string, any>,
     options?: ApiRequestOptions,
   ): Promise<ApiResponse> {
     const url = new URL(`${API_BASE_URL}${endpoint}`);
 
-    let data;
+    let data: string | undefined;
 
-    // GET uses query params
     if (method === "get" && payload) {
-      Object.entries(payload).forEach(([key, value]) => {
-        url.searchParams.append(key, String(value));
-      });
-    }
-
-    // Others use request body
-    else if (payload) {
+      Object.entries(payload).forEach(([k, v]) =>
+        url.searchParams.append(k, String(v)),
+      );
+    } else if (payload) {
       const body = new URLSearchParams();
-
-      Object.entries(payload).forEach(([key, value]) => {
-        body.append(key, String(value));
-      });
-
+      Object.entries(payload).forEach(([k, v]) => body.append(k, String(v)));
       data = body.toString();
     }
 
     const response = await this.request[method](url.toString(), {
       data,
-      timeout: options?.timeout || 30000,
-
+      timeout: options?.timeout ?? 30000,
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-
         ...options?.headers,
       },
     });
@@ -67,56 +57,47 @@ export class ApiService {
     };
   }
 
-  async get(
+  get(
     endpoint: string,
     params?: Record<string, string>,
     options?: ApiRequestOptions,
   ) {
-    return this.sendRequest("get", endpoint, params, options);
+    return this.send("get", endpoint, params, options);
   }
 
-  async post(
+  post(
     endpoint: string,
-    payload?: Record<string, string | number | boolean>,
+    payload?: Record<string, any>,
     options?: ApiRequestOptions,
   ) {
-    return this.sendRequest("post", endpoint, payload, options);
+    return this.send("post", endpoint, payload, options);
   }
 
-  async put(
+  put(
     endpoint: string,
-    payload?: Record<string, string | number | boolean>,
+    payload?: Record<string, any>,
     options?: ApiRequestOptions,
   ) {
-    return this.sendRequest("put", endpoint, payload, options);
+    return this.send("put", endpoint, payload, options);
   }
 
-  async delete(
+  delete(
     endpoint: string,
-    payload?: Record<string, string | number | boolean>,
+    payload?: Record<string, any>,
     options?: ApiRequestOptions,
   ) {
-    return this.sendRequest("delete", endpoint, payload, options);
+    return this.send("delete", endpoint, payload, options);
   }
 
-  /**
-   * Assert response status code
-   */
-  expectStatus(response: ApiResponse, expectedStatus: number): void {
-    expect(response.status).toBe(expectedStatus);
+  expectStatus(response: ApiResponse, code: number) {
+    expect(response.status).toBe(code);
   }
 
-  /**
-   * Assert response code in body
-   */
-  expectResponseCode(response: ApiResponse, expectedCode: number): void {
-    expect(response.responseCode).toBe(expectedCode);
+  expectResponseCode(response: ApiResponse, code: number) {
+    expect(response.responseCode).toBe(code);
   }
 
-  /**
-   * Assert message contains text
-   */
-  expectMessage(response: ApiResponse, expectedMessage: string): void {
-    expect(response.message).toContain(expectedMessage);
+  expectMessage(response: ApiResponse, msg: string) {
+    expect(response.message).toContain(msg);
   }
 }
