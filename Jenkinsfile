@@ -4,7 +4,6 @@ pipeline {
     options {
         skipDefaultCheckout(true)
         timestamps()
-        ansiColor('xterm')
     }
 
     parameters {
@@ -20,7 +19,6 @@ pipeline {
         HEADLESS = 'true'
 
         // Jenkins Credentials mappings (Configure these under Manage Jenkins > Credentials)
-        BASE_URL        = credentials('automation-base-url')
         LOGIN_EMAIL     = credentials('automation-login-email')
         LOGIN_PASSWORD  = credentials('automation-login-password')
         LOGIN_USER_NAME = credentials('automation-login-user-name')
@@ -58,7 +56,6 @@ pipeline {
                             docker run --rm \
                                 -e CI="$CI" \
                                 -e HEADLESS="$HEADLESS" \
-                                -e BASE_URL="$BASE_URL" \
                                 -e LOGIN_EMAIL="$LOGIN_EMAIL" \
                                 -e LOGIN_PASSWORD="$LOGIN_PASSWORD" \
                                 -e LOGIN_USER_NAME="$LOGIN_USER_NAME" \
