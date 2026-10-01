@@ -39,7 +39,7 @@ reporter: [
     ["junit", { outputFile: "reports/junit/junit-results.xml" }],
     [
       "allure-playwright",
-      { outputFolder: "reports/allure-results", detail: false, suiteTitle: true },
+      { resultsDir: "reports/allure-results", detail: false, suiteTitle: true },
     ],
   ],
 
